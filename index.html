@@ -193,23 +193,15 @@ let enteredPin = '';
 const $ = s => document.querySelector(s);
 const esc = s => (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* ---------------- FIREBASE (shared database, works from any phone) ---------------- */
-// วางค่าจาก Firebase Console > Project settings > Your apps ตรงนี้แทนของตัวอย่าง
+/* ------------------ FIREBASE (shared database) ------------------ */
 const firebaseConfig = {
-  apiKey: "AIzaSyD-xxxxx...",
+  apiKey: "วางค่าจริงจาก Firebase ตรงนี้",
   authDomain: "order-picker00.firebaseapp.com",
   projectId: "order-picker00",
   storageBucket: "order-picker00.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef123456"
+  messagingSenderId: "วางค่าจริงตรงนี้",
+  appId: "วางค่าจริงตรงนี้"
 };
-
-let db = null;
-let docRef = null;
-let dataReady = false;
-
-function configIsMissing(){
-  return Object.values(firebaseConfig).some(v => !v || v.includes('วางค่า'));
 }
 
 function initFirebase(){
