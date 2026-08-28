@@ -195,21 +195,13 @@ const esc = s => (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'
 
 /* ------------------ FIREBASE (shared database) ------------------ */
 const firebaseConfig = {
-  apiKey: "วางค่าจริงจาก Firebase ตรงนี้",
+  apiKey: "วาง apiKey จริงตรงนี้",
   authDomain: "order-picker00.firebaseapp.com",
   projectId: "order-picker00",
   storageBucket: "order-picker00.appspot.com",
-  messagingSenderId: "วางค่าจริงตรงนี้",
-  appId: "วางค่าจริงตรงนี้"
+  messagingSenderId: "วาง messagingSenderId จริงตรงนี้",
+  appId: "วาง appId จริงตรงนี้"
 };
-}
-
-function initFirebase(){
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.firestore();
-  docRef = db.collection('warehouse').doc('shop1');
-}
-
 // เขียนข้อมูลทั้งชุดกลับขึ้น Firestore (ทุกคนที่เปิดหน้านี้จะเห็นการเปลี่ยนแปลงเกือบทันที)
 async function pushState(){
   await docRef.set({ orders, items, users }, { merge:true });
