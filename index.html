@@ -6,6 +6,10 @@
 <title>ระบบหยิบของ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Firebase App (Compat Version) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<!-- Firebase Firestore (Compat Version) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --bg:#F3F4F6; --panel:#FFFFFF; --ink:#1C1F26; --sub:#6B7280; --line:#E3E5E9;
@@ -29,7 +33,7 @@
   header .who .role{font-size:9.5px;font-weight:700;background:#3A3F4B;color:#B9BEC8;
     padding:2px 6px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;}
   header .logout{background:none;border:none;color:#DADEE5;font-size:11px;font-weight:700;
-    text-decoration:underline;padding:0;}
+    text-decoration:underline;padding:0;cursor:pointer;}
 
   main{flex:1;padding:14px 14px 10px;}
   h2.page-title{font-size:15px;font-weight:800;margin:2px 0 12px;color:var(--ink);
@@ -59,13 +63,12 @@
   .attr{font-size:11.5px;color:var(--sub);background:var(--bg);border:1px solid var(--line);
     padding:2px 8px;border-radius:20px;}
   .item-qty-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-  .qty-label{font-size:12px;color:var(--sub);}
+  .ordered-note{font-size:11.5px;color:var(--sub);}
   .stepper{display:flex;align-items:center;gap:0;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;}
-  .stepper button{width:38px;height:38px;border:none;background:var(--bg);font-size:18px;font-weight:700;color:var(--ink);}
+  .stepper button{width:38px;height:38px;border:none;background:var(--bg);font-size:18px;font-weight:700;color:var(--ink);cursor:pointer;}
   .stepper input{width:52px;height:38px;border:none;border-left:1.5px solid var(--line);
     border-right:1.5px solid var(--line);text-align:center;font-family:'JetBrains Mono',monospace;
     font-weight:700;font-size:15px;}
-  .ordered-note{font-size:11.5px;color:var(--sub);}
 
   .ov-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;}
   .ov-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
@@ -86,11 +89,11 @@
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .toggle-row{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;}
   .toggle-row button{flex:1;min-width:70px;padding:10px;border-radius:9px;border:1.5px solid var(--line);
-    background:#fff;font-weight:700;font-size:14px;color:var(--sub);}
+    background:#fff;font-weight:700;font-size:14px;color:var(--sub);cursor:pointer;}
   .toggle-row button.active.s1{background:var(--side1);border-color:var(--side1);color:#fff;}
   .toggle-row button.active.s2{background:var(--side2);border-color:var(--side2);color:#fff;}
   .btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--ink);
-    color:#fff;font-weight:700;font-size:15px;margin-top:14px;}
+    color:#fff;font-weight:700;font-size:15px;margin-top:14px;cursor:pointer;}
   .btn.secondary{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
   .section-title{font-size:13px;font-weight:800;color:var(--sub);text-transform:uppercase;
     letter-spacing:.5px;margin:22px 0 10px;}
@@ -99,11 +102,11 @@
   .admin-order-row:last-child,.admin-item-row:last-child,.admin-user-row:last-child{border-bottom:none;}
   .admin-item-main{font-size:13.5px;}
   .admin-item-main b{font-family:'JetBrains Mono',monospace;}
-  .del-x{background:none;border:none;color:var(--danger);font-size:18px;font-weight:800;padding:4px 8px;flex-shrink:0;}
+  .del-x{background:none;border:none;color:var(--danger);font-size:18px;font-weight:800;padding:4px 8px;flex-shrink:0;cursor:pointer;}
   .datalist-hint{font-size:11px;color:var(--sub);margin-top:-2px;margin-bottom:2px;}
   .chip-select{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
   .chip-select button{padding:7px 12px;border-radius:20px;border:1.5px solid var(--line);
-    background:#fff;font-size:12.5px;font-weight:700;color:var(--sub);font-family:'JetBrains Mono',monospace;}
+    background:#fff;font-size:12.5px;font-weight:700;color:var(--sub);font-family:'JetBrains Mono',monospace;cursor:pointer;}
   .chip-select button.on{background:var(--ink);border-color:var(--ink);color:#fff;}
   .role-pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
   .role-pill.admin{background:#EAE1F6;color:#6B3FA0;}
@@ -112,12 +115,12 @@
   nav.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
     display:flex;max-width:520px;margin:0 auto;z-index:30;}
   nav.bottom button{flex:1;padding:10px 4px 12px;background:none;border:none;color:var(--sub);
-    font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;}
+    font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
   nav.bottom button .ico{font-size:19px;}
   nav.bottom button.active{color:var(--ink);}
 
   .floor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
-  .floor-tile{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:left;}
+  .floor-tile{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:left;cursor:pointer;}
   .floor-tile .code{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;}
   .floor-tile .cat{font-size:11.5px;color:var(--sub);margin-top:4px;line-height:1.4;}
   .floor-tile.s1{border-left:5px solid var(--side1);}
@@ -125,7 +128,7 @@
   .floor-tile .count{margin-top:8px;font-size:11px;font-weight:700;color:var(--sub);}
 
   .back-btn{background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;
-    padding:0 0 10px;display:flex;align-items:center;gap:4px;}
+    padding:0 0 10px;display:flex;align-items:center;gap:4px;cursor:pointer;}
 
   /* login screen */
   #loginScreen{max-width:360px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;
@@ -138,7 +141,7 @@
   .pin-dots span.filled{background:var(--ink);border-color:var(--ink);}
   .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;}
   .keypad button{padding:16px 0;font-size:20px;font-weight:700;border-radius:12px;
-    border:1.5px solid var(--line);background:#fff;font-family:'JetBrains Mono',monospace;}
+    border:1.5px solid var(--line);background:#fff;font-family:'JetBrains Mono',monospace;cursor:pointer;}
   .keypad button.fn{font-family:'Inter',sans-serif;font-size:13px;color:var(--sub);font-weight:700;}
   .login-error{color:var(--danger);font-size:12.5px;font-weight:600;margin-top:14px;min-height:16px;}
   .login-hint{margin-top:26px;font-size:11px;color:var(--sub);text-align:center;line-height:1.6;}
@@ -186,7 +189,7 @@ const FLOORS = {
 let orders = [];
 let items = [];
 let users = [];
-let currentUser = null; // in-memory only, lost on refresh
+let currentUser = null;
 let route = {page:'overview'};
 let enteredPin = '';
 
@@ -216,22 +219,44 @@ function initFirebase(){
   db = firebase.firestore();
   docRef = db.collection('warehouse').doc('shop1');
 }
+
+async function pushState(){
+  if(!docRef) return;
+  await docRef.set({ orders, items, users }, { merge: true });
+}
+
+async function saveItems(){ await pushState(); }
+async function saveOrders(){ await pushState(); }
+async function saveUsers(){ await pushState(); }
+
+function loadData(){
+  if(configIsMissing()){
+    showLogin();
+    return;
+  }
+  initFirebase();
+  docRef.onSnapshot(async doc => {
+    if(doc.exists){
+      const data = doc.data();
       orders = data.orders || [];
       items = data.items || [];
       users = data.users || [];
       if(users.length === 0){
-       async function pushState(){
-  await docRef.set({ orders, items, users }, { merge:true });
-}
+        users = [{id:'admin-1', name:'แอดมิน', pin:'0000', role:'admin', floors:[]}];
+        await pushState();
+      }
+    } else {
+      users = [{id:'admin-1', name:'แอดมิน', pin:'0000', role:'admin', floors:[]}];
+      await pushState();
     }
     if(!dataReady){ dataReady = true; onFirstLoad(); }
     else if(currentUser){
-      // sync ข้อมูลล่าสุดของ currentUser เอง เผื่อแอดมินแก้สิทธิ์จากเครื่องอื่น
       const fresh = users.find(u=>u.id===currentUser.id);
       currentUser = fresh || currentUser;
       render();
     }
-  }, err=>{
+  }, err => {
+    $('#loginScreen').style.display = 'flex';
     $('#loginScreen').innerHTML = `<div style="text-align:center;padding:30px">
       <div style="font-size:34px;margin-bottom:10px">⚠️</div>
       <b>เชื่อมต่อฐานข้อมูลไม่ได้</b>
@@ -241,19 +266,26 @@ function initFirebase(){
   });
 }
 
+function onFirstLoad(){
+  showLogin();
+}
+
 function nextItemId(){
   const n = items.length ? Math.max(...items.map(i=>parseInt(i.id.split('-')[1]||0))) + 1 : 1;
   return 'IT-' + String(n).padStart(6,'0');
 }
+
 function itemsForFloor(code){
   const f = FLOORS[code];
   return items.filter(i => i.side===f.side && i.floor===f.floor);
 }
+
 function status(i){
   if(!i.qtyPicked || i.qtyPicked===0) return 'idle';
   if(i.qtyPicked >= i.qtyOrdered) return 'complete';
   return 'partial';
 }
+
 function allowedFloorCodes(){
   if(currentUser.role === 'admin') return Object.keys(FLOORS);
   return currentUser.floors || [];
@@ -271,11 +303,13 @@ function renderKeypad(){
     b.onclick = ()=> onKey(b.dataset.k);
   });
 }
+
 function updateDots(){
   const dots = Array.from({length:6}, (_,i)=>
     `<span class="${i < enteredPin.length ? 'filled':''}"></span>`).join('');
   $('#pinDots').innerHTML = dots;
 }
+
 function onKey(k){
   $('#loginError').textContent = '';
   if(k==='clear'){ enteredPin=''; }
@@ -294,6 +328,7 @@ function onKey(k){
     }
   }
 }
+
 function showLogin(){
   currentUser = null;
   $('#loginScreen').style.display = 'flex';
@@ -301,6 +336,7 @@ function showLogin(){
   enteredPin=''; updateDots();
   renderKeypad();
 }
+
 function showApp(){
   $('#loginScreen').style.display = 'none';
   $('#app').style.display = 'flex';
@@ -311,6 +347,7 @@ function showApp(){
   renderNav();
   render();
 }
+
 $('#logoutBtn') && ($('#logoutBtn').onclick = showLogin);
 
 /* ---------------- NAV ---------------- */
@@ -325,6 +362,7 @@ function renderNav(){
   });
   setNav(route.page==='floor' ? 'floors' : route.page);
 }
+
 function setNav(active){
   document.querySelectorAll('nav.bottom button').forEach(b=>{
     b.classList.toggle('active', b.dataset.nav===active);
@@ -662,9 +700,8 @@ function renderFloorButtons(){
   });
 }
 
-(async function init(){
-  await loadData();
-  showLogin();
+(function init(){
+  loadData();
 })();
 </script>
 </body>
