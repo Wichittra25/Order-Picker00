@@ -193,33 +193,29 @@ let enteredPin = '';
 const $ = s => document.querySelector(s);
 const esc = s => (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* ------------------ FIREBASE (shared database) ------------------ */
+/* ------------------ FIREBASE CONFIG ------------------ */
 const firebaseConfig = {
-  apiKey: "วาง apiKey จริงตรงนี้",
+  apiKey: "วางค่าจริงจาก Firebase ตรงนี้",
   authDomain: "order-picker00.firebaseapp.com",
   projectId: "order-picker00",
   storageBucket: "order-picker00.appspot.com",
-  messagingSenderId: "วาง messagingSenderId จริงตรงนี้",
-  appId: "วาง appId จริงตรงนี้"
+  messagingSenderId: "วางค่าจริงตรงนี้",
+  appId: "วางค่าจริงตรงนี้"
 };
-// เขียนข้อมูลทั้งชุดกลับขึ้น Firestore (ทุกคนที่เปิดหน้านี้จะเห็นการเปลี่ยนแปลงเกือบทันที)
-async function pushState(){
-  await docRef.set({ orders, items, users }, { merge:true });
-}
-async function saveOrders(){ await pushState(); }
-async function saveItems(){ await pushState(); }
-async function saveUsers(){ await pushState(); }
 
-// ฟังการเปลี่ยนแปลงแบบเรียลไทม์ — เครื่องอื่นแก้ปุ๊บ หน้าจอนี้อัปเดตปั๊บ โดยไม่ต้องรีเฟรช
-function listenForChanges(onFirstLoad){
-  docRef.onSnapshot(async snap=>{
-    const data = snap.data();
-    if(!data){
-      // ยังไม่มีข้อมูลเลย (ครั้งแรกสุด) -> สร้างแอดมินเริ่มต้น
-      orders = []; items = [];
-      users = [{id:'admin-1', name:'แอดมิน', pin:'0000', role:'admin', floors:[]}];
-      await pushState();
-    } else {
+let db = null;
+let docRef = null;
+let dataReady = false;
+
+function configIsMissing(){
+  return Object.values(firebaseConfig).some(v => !v || v.includes('วางค่า'));
+}
+
+function initFirebase(){
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  docRef = db.collection('warehouse').doc('shop1');
+}
       orders = data.orders || [];
       items = data.items || [];
       users = data.users || [];
