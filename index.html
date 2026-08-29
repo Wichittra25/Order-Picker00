@@ -6,10 +6,6 @@
 <title>ระบบหยิบของ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Firebase App (Compat Version) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<!-- Firebase Firestore (Compat Version) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --bg:#F3F4F6; --panel:#FFFFFF; --ink:#1C1F26; --sub:#6B7280; --line:#E3E5E9;
@@ -33,7 +29,7 @@
   header .who .role{font-size:9.5px;font-weight:700;background:#3A3F4B;color:#B9BEC8;
     padding:2px 6px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;}
   header .logout{background:none;border:none;color:#DADEE5;font-size:11px;font-weight:700;
-    text-decoration:underline;padding:0;cursor:pointer;}
+    text-decoration:underline;padding:0;}
 
   main{flex:1;padding:14px 14px 10px;}
   h2.page-title{font-size:15px;font-weight:800;margin:2px 0 12px;color:var(--ink);
@@ -55,7 +51,7 @@
   .item-order{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
     background:var(--idle-soft);color:var(--idle);padding:2px 7px;border-radius:5px;}
   .item-status{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;}
-  .item-status.idle{background:var(--idle-soft);color:var(--idle);}
+  .item-status.idle{background:var(--warn-soft);color:var(--warn);}
   .item-status.partial{background:var(--warn-soft);color:var(--warn);}
   .item-status.complete{background:var(--ok-soft);color:var(--ok);}
   .item-cat{font-weight:700;font-size:15px;margin-bottom:2px;}
@@ -63,12 +59,24 @@
   .attr{font-size:11.5px;color:var(--sub);background:var(--bg);border:1px solid var(--line);
     padding:2px 8px;border-radius:20px;}
   .item-qty-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-  .ordered-note{font-size:11.5px;color:var(--sub);}
+
+  /* receipt card (ใบเสร็จต่อออเดอร์ต่อชั้น) */
+  .receipt-card{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--warn);
+    border-radius:12px;padding:14px;margin-bottom:12px;}
+  .receipt-card.done{border-left-color:var(--ok);}
+  .receipt-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px;}
+  .receipt-line{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+    padding:9px 0;border-top:1px dashed var(--line);}
+  .receipt-line:first-of-type{border-top:none;padding-top:0;}
+  .receipt-line-main b{font-size:14.5px;}
+  .receipt-line-qty{font-size:13px;font-weight:700;color:var(--sub);white-space:nowrap;padding-top:2px;}
+  .qty-label{font-size:12px;color:var(--sub);}
   .stepper{display:flex;align-items:center;gap:0;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;}
-  .stepper button{width:38px;height:38px;border:none;background:var(--bg);font-size:18px;font-weight:700;color:var(--ink);cursor:pointer;}
+  .stepper button{width:38px;height:38px;border:none;background:var(--bg);font-size:18px;font-weight:700;color:var(--ink);}
   .stepper input{width:52px;height:38px;border:none;border-left:1.5px solid var(--line);
     border-right:1.5px solid var(--line);text-align:center;font-family:'JetBrains Mono',monospace;
     font-weight:700;font-size:15px;}
+  .ordered-note{font-size:11.5px;color:var(--sub);}
 
   .ov-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;}
   .ov-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
@@ -89,11 +97,11 @@
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .toggle-row{display:flex;gap:8px;margin-top:5px;flex-wrap:wrap;}
   .toggle-row button{flex:1;min-width:70px;padding:10px;border-radius:9px;border:1.5px solid var(--line);
-    background:#fff;font-weight:700;font-size:14px;color:var(--sub);cursor:pointer;}
+    background:#fff;font-weight:700;font-size:14px;color:var(--sub);}
   .toggle-row button.active.s1{background:var(--side1);border-color:var(--side1);color:#fff;}
   .toggle-row button.active.s2{background:var(--side2);border-color:var(--side2);color:#fff;}
   .btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--ink);
-    color:#fff;font-weight:700;font-size:15px;margin-top:14px;cursor:pointer;}
+    color:#fff;font-weight:700;font-size:15px;margin-top:14px;}
   .btn.secondary{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
   .section-title{font-size:13px;font-weight:800;color:var(--sub);text-transform:uppercase;
     letter-spacing:.5px;margin:22px 0 10px;}
@@ -102,11 +110,11 @@
   .admin-order-row:last-child,.admin-item-row:last-child,.admin-user-row:last-child{border-bottom:none;}
   .admin-item-main{font-size:13.5px;}
   .admin-item-main b{font-family:'JetBrains Mono',monospace;}
-  .del-x{background:none;border:none;color:var(--danger);font-size:18px;font-weight:800;padding:4px 8px;flex-shrink:0;cursor:pointer;}
+  .del-x{background:none;border:none;color:var(--danger);font-size:18px;font-weight:800;padding:4px 8px;flex-shrink:0;}
   .datalist-hint{font-size:11px;color:var(--sub);margin-top:-2px;margin-bottom:2px;}
   .chip-select{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
   .chip-select button{padding:7px 12px;border-radius:20px;border:1.5px solid var(--line);
-    background:#fff;font-size:12.5px;font-weight:700;color:var(--sub);font-family:'JetBrains Mono',monospace;cursor:pointer;}
+    background:#fff;font-size:12.5px;font-weight:700;color:var(--sub);font-family:'JetBrains Mono',monospace;}
   .chip-select button.on{background:var(--ink);border-color:var(--ink);color:#fff;}
   .role-pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
   .role-pill.admin{background:#EAE1F6;color:#6B3FA0;}
@@ -115,12 +123,12 @@
   nav.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
     display:flex;max-width:520px;margin:0 auto;z-index:30;}
   nav.bottom button{flex:1;padding:10px 4px 12px;background:none;border:none;color:var(--sub);
-    font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+    font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;}
   nav.bottom button .ico{font-size:19px;}
   nav.bottom button.active{color:var(--ink);}
 
   .floor-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
-  .floor-tile{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:left;cursor:pointer;}
+  .floor-tile{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:left;}
   .floor-tile .code{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;}
   .floor-tile .cat{font-size:11.5px;color:var(--sub);margin-top:4px;line-height:1.4;}
   .floor-tile.s1{border-left:5px solid var(--side1);}
@@ -128,7 +136,7 @@
   .floor-tile .count{margin-top:8px;font-size:11px;font-weight:700;color:var(--sub);}
 
   .back-btn{background:none;border:none;color:var(--sub);font-size:13px;font-weight:600;
-    padding:0 0 10px;display:flex;align-items:center;gap:4px;cursor:pointer;}
+    padding:0 0 10px;display:flex;align-items:center;gap:4px;}
 
   /* login screen */
   #loginScreen{max-width:360px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;
@@ -141,7 +149,7 @@
   .pin-dots span.filled{background:var(--ink);border-color:var(--ink);}
   .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:280px;}
   .keypad button{padding:16px 0;font-size:20px;font-weight:700;border-radius:12px;
-    border:1.5px solid var(--line);background:#fff;font-family:'JetBrains Mono',monospace;cursor:pointer;}
+    border:1.5px solid var(--line);background:#fff;font-family:'JetBrains Mono',monospace;}
   .keypad button.fn{font-family:'Inter',sans-serif;font-size:13px;color:var(--sub);font-weight:700;}
   .login-error{color:var(--danger);font-size:12.5px;font-weight:600;margin-top:14px;min-height:16px;}
   .login-hint{margin-top:26px;font-size:11px;color:var(--sub);text-align:center;line-height:1.6;}
@@ -189,21 +197,22 @@ const FLOORS = {
 let orders = [];
 let items = [];
 let users = [];
-let currentUser = null;
+let currentUser = null; // in-memory only, lost on refresh
 let route = {page:'overview'};
 let enteredPin = '';
 
 const $ = s => document.querySelector(s);
 const esc = s => (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* ------------------ FIREBASE CONFIG ------------------ */
+/* ---------------- FIREBASE (shared database, works from any phone) ---------------- */
+// วางค่าจาก Firebase Console > Project settings > Your apps ตรงนี้แทนของตัวอย่าง
 const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "order-picker00.firebaseapp.com",
-  projectId: "order-picker00",
-  storageBucket: "order-picker00.appspot.com",
-  messagingSenderId: "1234567890...",
-  appId: "1:1234567890:web:..."
+  apiKey: "วางค่าของคุณตรงนี้",
+  authDomain: "วางค่าของคุณตรงนี้",
+  projectId: "วางค่าของคุณตรงนี้",
+  storageBucket: "วางค่าของคุณตรงนี้",
+  messagingSenderId: "วางค่าของคุณตรงนี้",
+  appId: "วางค่าของคุณตรงนี้"
 };
 
 let db = null;
@@ -220,24 +229,24 @@ function initFirebase(){
   docRef = db.collection('warehouse').doc('shop1');
 }
 
+// เขียนข้อมูลทั้งชุดกลับขึ้น Firestore (ทุกคนที่เปิดหน้านี้จะเห็นการเปลี่ยนแปลงเกือบทันที)
 async function pushState(){
-  if(!docRef) return;
-  await docRef.set({ orders, items, users }, { merge: true });
+  await docRef.set({ orders, items, users }, { merge:true });
 }
-
-async function saveItems(){ await pushState(); }
 async function saveOrders(){ await pushState(); }
+async function saveItems(){ await pushState(); }
 async function saveUsers(){ await pushState(); }
 
-function loadData(){
-  if(configIsMissing()){
-    showLogin();
-    return;
-  }
-  initFirebase();
-  docRef.onSnapshot(async doc => {
-    if(doc.exists){
-      const data = doc.data();
+// ฟังการเปลี่ยนแปลงแบบเรียลไทม์ — เครื่องอื่นแก้ปุ๊บ หน้าจอนี้อัปเดตปั๊บ โดยไม่ต้องรีเฟรช
+function listenForChanges(onFirstLoad){
+  docRef.onSnapshot(async snap=>{
+    const data = snap.data();
+    if(!data){
+      // ยังไม่มีข้อมูลเลย (ครั้งแรกสุด) -> สร้างแอดมินเริ่มต้น
+      orders = []; items = [];
+      users = [{id:'admin-1', name:'แอดมิน', pin:'0000', role:'admin', floors:[]}];
+      await pushState();
+    } else {
       orders = data.orders || [];
       items = data.items || [];
       users = data.users || [];
@@ -245,18 +254,15 @@ function loadData(){
         users = [{id:'admin-1', name:'แอดมิน', pin:'0000', role:'admin', floors:[]}];
         await pushState();
       }
-    } else {
-      users = [{id:'admin-1', name:'แอดมิน', pin:'0000', role:'admin', floors:[]}];
-      await pushState();
     }
     if(!dataReady){ dataReady = true; onFirstLoad(); }
     else if(currentUser){
+      // sync ข้อมูลล่าสุดของ currentUser เอง เผื่อแอดมินแก้สิทธิ์จากเครื่องอื่น
       const fresh = users.find(u=>u.id===currentUser.id);
       currentUser = fresh || currentUser;
       render();
     }
-  }, err => {
-    $('#loginScreen').style.display = 'flex';
+  }, err=>{
     $('#loginScreen').innerHTML = `<div style="text-align:center;padding:30px">
       <div style="font-size:34px;margin-bottom:10px">⚠️</div>
       <b>เชื่อมต่อฐานข้อมูลไม่ได้</b>
@@ -266,26 +272,42 @@ function loadData(){
   });
 }
 
-function onFirstLoad(){
-  showLogin();
-}
-
 function nextItemId(){
   const n = items.length ? Math.max(...items.map(i=>parseInt(i.id.split('-')[1]||0))) + 1 : 1;
   return 'IT-' + String(n).padStart(6,'0');
 }
-
 function itemsForFloor(code){
   const f = FLOORS[code];
   return items.filter(i => i.side===f.side && i.floor===f.floor);
 }
-
+// ใบเสร็จ = กลุ่มรายการของออเดอร์เดียวกัน ที่อยู่ในฝั่ง/ชั้นเดียวกัน
+function receiptsForFloor(code){
+  const f = FLOORS[code];
+  const floorItems = items.filter(i=>i.side===f.side && i.floor===f.floor);
+  const orderIds = [...new Set(floorItems.map(i=>i.orderId))];
+  return orderIds.map(oid=>{
+    const its = floorItems.filter(i=>i.orderId===oid);
+    return { orderId: oid, items: its, isDone: its.every(i=>i.qtyPicked >= i.qtyOrdered) };
+  });
+}
+function receiptsForOrder(oid){
+  const its = items.filter(i=>i.orderId===oid);
+  const groups = {};
+  its.forEach(i=>{
+    const key = i.side+'-'+i.floor;
+    if(!groups[key]) groups[key] = {side:i.side, floor:i.floor, items:[]};
+    groups[key].items.push(i);
+  });
+  return Object.values(groups).map(g=>({
+    side: g.side, floor: g.floor, code: 'F'+g.side+'S'+g.floor, items: g.items,
+    isDone: g.items.every(i=>i.qtyPicked >= i.qtyOrdered)
+  }));
+}
 function status(i){
   if(!i.qtyPicked || i.qtyPicked===0) return 'idle';
   if(i.qtyPicked >= i.qtyOrdered) return 'complete';
   return 'partial';
 }
-
 function allowedFloorCodes(){
   if(currentUser.role === 'admin') return Object.keys(FLOORS);
   return currentUser.floors || [];
@@ -303,13 +325,11 @@ function renderKeypad(){
     b.onclick = ()=> onKey(b.dataset.k);
   });
 }
-
 function updateDots(){
   const dots = Array.from({length:6}, (_,i)=>
     `<span class="${i < enteredPin.length ? 'filled':''}"></span>`).join('');
   $('#pinDots').innerHTML = dots;
 }
-
 function onKey(k){
   $('#loginError').textContent = '';
   if(k==='clear'){ enteredPin=''; }
@@ -328,7 +348,6 @@ function onKey(k){
     }
   }
 }
-
 function showLogin(){
   currentUser = null;
   $('#loginScreen').style.display = 'flex';
@@ -336,7 +355,6 @@ function showLogin(){
   enteredPin=''; updateDots();
   renderKeypad();
 }
-
 function showApp(){
   $('#loginScreen').style.display = 'none';
   $('#app').style.display = 'flex';
@@ -347,7 +365,6 @@ function showApp(){
   renderNav();
   render();
 }
-
 $('#logoutBtn') && ($('#logoutBtn').onclick = showLogin);
 
 /* ---------------- NAV ---------------- */
@@ -362,7 +379,6 @@ function renderNav(){
   });
   setNav(route.page==='floor' ? 'floors' : route.page);
 }
-
 function setNav(active){
   document.querySelectorAll('nav.bottom button').forEach(b=>{
     b.classList.toggle('active', b.dataset.nav===active);
@@ -387,15 +403,17 @@ function renderOverview(){
     html += `<div class="empty"><b>ยังไม่มีรายการ</b>รอแอดมินเพิ่มออเดอร์และรายการสินค้า</div>`;
   }
   orderIds.forEach(oid=>{
-    const its = items.filter(i=>i.orderId===oid);
-    const total = its.length;
-    const complete = its.filter(i=>status(i)==='complete').length;
-    const missing = total - complete;
-    const pct = total ? Math.round(complete/total*100) : 0;
+    const receipts = receiptsForOrder(oid);
+    const total = receipts.length;
+    const done = receipts.filter(r=>r.isDone).length;
+    const pct = total ? Math.round(done/total*100) : 0;
     const orderMeta = orders.find(o=>o.orderId===oid);
     let pillClass='none', pillText='ยังไม่เริ่ม';
-    if(complete===total && total>0){ pillClass='ready'; pillText='✅ พร้อมตรวจ'; }
-    else if(complete>0){ pillClass='pending'; pillText='⏳ ยังไม่ครบ'; }
+    if(done===total && total>0){ pillClass='ready'; pillText='✅ พร้อมตรวจ'; }
+    else if(done>0){ pillClass='pending'; pillText='⏳ ยังไม่ครบ'; }
+    const floorChips = receipts.map(r=>
+      `<span class="attr" style="${r.isDone ? 'color:var(--ok);border-color:#BFE3CC' : ''}">${r.isDone?'✓ ':''}${r.code}</span>`
+    ).join('');
     html += `<div class="ov-card">
       <div class="ov-top">
         <div class="ov-order mono">${esc(oid)}</div>
@@ -403,9 +421,10 @@ function renderOverview(){
       </div>
       <div class="barwrap"><div class="bar" style="width:${pct}%"></div></div>
       <div class="ov-meta">
-        <span>หยิบแล้ว ${complete}/${total} รายการ${missing>0 ? ' · ขาด '+missing : ''}</span>
+        <span>ใบเสร็จเสร็จแล้ว ${done}/${total} ชั้น</span>
         <span>${orderMeta && orderMeta.date ? esc(orderMeta.date) : ''}</span>
       </div>
+      <div class="item-attrs" style="margin-top:8px">${floorChips}</div>
     </div>`;
   });
   $('#main').innerHTML = html;
@@ -417,12 +436,12 @@ function renderFloorPicker(){
   let html = `<h2 class="page-title">เลือกฝั่ง / ชั้น</h2><div class="floor-grid">`;
   allowed.forEach(code=>{
     const f = FLOORS[code];
-    const its = itemsForFloor(code);
-    const done = its.filter(i=>status(i)==='complete').length;
+    const receipts = receiptsForFloor(code);
+    const done = receipts.filter(r=>r.isDone).length;
     html += `<button class="floor-tile s${f.side}" data-code="${code}">
       <div class="code mono">${code}</div>
       <div class="cat">${esc(f.cats)}</div>
-      <div class="count">${its.length ? done+'/'+its.length+' หยิบครบ' : 'ยังไม่มีรายการ'}</div>
+      <div class="count">${receipts.length ? done+'/'+receipts.length+' ใบเสร็จเสร็จแล้ว' : 'ยังไม่มีใบเสร็จ'}</div>
     </button>`;
   });
   html += `</div>`;
@@ -433,58 +452,83 @@ function renderFloorPicker(){
   });
 }
 
-/* ---------------- FLOOR DETAIL ---------------- */
-function renderFloor(code){
-  if(!allowedFloorCodes().includes(code)){ route={page:'floors'}; renderFloorPicker(); return; }
-  const f = FLOORS[code];
-  const its = itemsForFloor(code);
-  const showBack = currentUser.role==='admin' || allowedFloorCodes().length>1;
-  let html = showBack ? `<button class="back-btn" id="backBtn">← กลับไปเลือกชั้น</button>` : '';
-  html += `<h2 class="page-title side${f.side}"><span class="badge-floor mono">${code}</span> ${esc(f.label)}</h2>`;
-  if(its.length===0){
-    html += `<div class="empty"><b>ยังไม่มีรายการของชั้นนี้</b>แอดมินยังไม่ได้เพิ่มรายการเข้าฝั่ง ${f.side} ชั้น ${f.floor}</div>`;
-  }
-  its.forEach(i=>{
-    const st = status(i);
+/* ---------------- FLOOR DETAIL (ใบเสร็จต่อออเดอร์) ---------------- */
+function receiptCardHtml(r){
+  const lines = r.items.map(i=>{
     const attrs = [];
     if(i.color && i.color!=='-') attrs.push('สี '+i.color);
     if(i.size && i.size!=='-') attrs.push('ไซส์ '+i.size);
     if(i.pattern && i.pattern!=='-') attrs.push('ลาย '+i.pattern);
     if(i.model && i.model!=='-') attrs.push('รุ่น '+i.model);
-    const stLabel = st==='complete' ? '✓ ครบ' : st==='partial' ? 'ขาด ' + (i.qtyOrdered - i.qtyPicked) : 'ยังไม่หยิบ';
-    html += `<div class="item ${st}" data-id="${i.id}">
-      <div class="item-top">
-        <span class="item-order mono">${esc(i.orderId)}</span>
-        <span class="item-status ${st}">${stLabel}</span>
+    return `<div class="receipt-line">
+      <div class="receipt-line-main">
+        <b>${esc(i.category)}</b>
+        <div class="item-attrs">${attrs.map(a=>`<span class="attr">${esc(a)}</span>`).join('') || '<span class="attr">ไม่มีสเปกเพิ่มเติม</span>'}</div>
       </div>
-      <div class="item-cat">${esc(i.category)}</div>
-      <div class="item-attrs">${attrs.map(a=>`<span class="attr">${esc(a)}</span>`).join('') || '<span class="attr">ไม่มีสเปกเพิ่มเติม</span>'}</div>
-      <div class="item-qty-row">
-        <span class="ordered-note">สั่ง <b class="mono">${i.qtyOrdered}</b> ชิ้น</span>
-        <div class="stepper">
-          <button class="dec">−</button>
-          <input type="number" class="pickedInput" value="${i.qtyPicked||0}" min="0" inputmode="numeric">
-          <button class="inc">+</button>
-        </div>
-      </div>
+      <div class="receipt-line-qty mono">${i.qtyOrdered} ชิ้น</div>
     </div>`;
-  });
+  }).join('');
+  const orderMeta = orders.find(o=>o.orderId===r.orderId);
+  return `<div class="receipt-card ${r.isDone?'done':''}">
+    <div class="receipt-head">
+      <div>
+        <span class="item-order mono">${esc(r.orderId)}</span>
+        ${orderMeta && orderMeta.note ? `<div style="font-size:11.5px;color:var(--sub);margin-top:4px">${esc(orderMeta.note)}</div>` : ''}
+      </div>
+      <span class="item-status ${r.isDone?'complete':'idle'}">${r.isDone ? '✓ เสร็จแล้ว' : 'รอหยิบ'}</span>
+    </div>
+    ${lines}
+    ${r.isDone
+      ? `<button class="btn secondary" style="margin-top:12px" data-undobtn="${esc(r.orderId)}">↺ ยกเลิก / หยิบใหม่</button>`
+      : `<button class="btn" style="margin-top:12px" data-donebtn="${esc(r.orderId)}">✅ หยิบเสร็จแล้ว</button>`}
+  </div>`;
+}
+
+function renderFloor(code){
+  if(!allowedFloorCodes().includes(code)){ route={page:'floors'}; renderFloorPicker(); return; }
+  const f = FLOORS[code];
+  const receipts = receiptsForFloor(code);
+  const pending = receipts.filter(r=>!r.isDone);
+  const done = receipts.filter(r=>r.isDone);
+  const showBack = currentUser.role==='admin' || allowedFloorCodes().length>1;
+
+  let html = showBack ? `<button class="back-btn" id="backBtn">← กลับไปเลือกชั้น</button>` : '';
+  html += `<h2 class="page-title side${f.side}"><span class="badge-floor mono">${code}</span> ${esc(f.label)}</h2>`;
+
+  if(receipts.length===0){
+    html += `<div class="empty"><b>ยังไม่มีใบเสร็จของชั้นนี้</b>แอดมินยังไม่ได้เพิ่มรายการเข้าฝั่ง ${f.side} ชั้น ${f.floor}</div>`;
+  } else {
+    if(pending.length){
+      html += `<div class="section-title">รอหยิบ (${pending.length})</div>`;
+      pending.forEach(r => html += receiptCardHtml(r));
+    }
+    if(done.length){
+      html += `<div class="section-title">หยิบเสร็จแล้ว (${done.length})</div>`;
+      done.forEach(r => html += receiptCardHtml(r));
+    }
+  }
+
   $('#main').innerHTML = html;
   if(showBack) $('#backBtn').onclick = ()=>{ route={page:'floors'}; render(); };
 
-  document.querySelectorAll('.item').forEach(card=>{
-    const id = card.dataset.id;
-    const input = card.querySelector('.pickedInput');
-    const item = items.find(x=>x.id===id);
-    const commit = async (val)=>{
-      let v = parseInt(val); if(isNaN(v) || v<0) v = 0;
-      item.qtyPicked = v;
+  document.querySelectorAll('[data-donebtn]').forEach(b=>{
+    b.onclick = async ()=>{
+      const oid = b.dataset.donebtn;
+      items.filter(i=>i.orderId===oid && i.side===f.side && i.floor===f.floor)
+           .forEach(i=> i.qtyPicked = i.qtyOrdered);
       await saveItems();
       renderFloor(code);
     };
-    card.querySelector('.inc').onclick = ()=> commit((item.qtyPicked||0)+1);
-    card.querySelector('.dec').onclick = ()=> commit(Math.max(0,(item.qtyPicked||0)-1));
-    input.onchange = ()=> commit(input.value);
+  });
+  document.querySelectorAll('[data-undobtn]').forEach(b=>{
+    b.onclick = async ()=>{
+      if(!confirm('ยกเลิกการหยิบของใบเสร็จนี้ กลับไปเป็น "รอหยิบ"?')) return;
+      const oid = b.dataset.undobtn;
+      items.filter(i=>i.orderId===oid && i.side===f.side && i.floor===f.floor)
+           .forEach(i=> i.qtyPicked = 0);
+      await saveItems();
+      renderFloor(code);
+    };
   });
 }
 
@@ -700,8 +744,9 @@ function renderFloorButtons(){
   });
 }
 
-(function init(){
-  loadData();
+(async function init(){
+  await loadData();
+  showLogin();
 })();
 </script>
 </body>
