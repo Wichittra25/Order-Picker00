@@ -121,6 +121,11 @@
   .role-pill{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
   .role-pill.admin{background:#EAE1F6;color:#6B3FA0;}
   .role-pill.floor{background:var(--idle-soft);color:var(--idle);}
+  .access-link-row{display:flex;gap:6px;margin-top:9px;}
+  .access-link-input{flex:1;padding:8px 10px;font-size:11px;border:1.5px dashed var(--line);
+    border-radius:8px;background:var(--bg);color:var(--sub);}
+  .copy-link-btn{flex-shrink:0;padding:0 14px;border-radius:8px;border:1.5px solid var(--ink);
+    background:var(--ink);color:#fff;font-size:12px;font-weight:700;}
 
   nav.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
     display:flex;max-width:520px;margin:0 auto;z-index:30;}
@@ -367,7 +372,24 @@ function showApp(){
   renderNav();
   render();
 }
-$('#logoutBtn') && ($('#logoutBtn').onclick = showLogin);
+// เข้าลิงก์ที่ฝังรหัส (?pin=1234) แล้วเข้าใช้งานอัตโนมัติ ไม่ต้องกดคีย์แพดทุกวัน
+function tryAutoLoginOrShowLogin(){
+  const pin = new URLSearchParams(location.search).get('pin');
+  if(pin){
+    const match = users.find(u=>u.pin===pin);
+    if(match){ currentUser = match; showApp(); return; }
+  }
+  showLogin();
+}
+function accessLinkFor(pin){
+  return location.origin + location.pathname + '?pin=' + encodeURIComponent(pin);
+}
+$('#logoutBtn') && ($('#logoutBtn').onclick = ()=>{
+  // ลบ ?pin= ออกจาก URL ตอนออกจากระบบ ไม่งั้นรีเฟรชแล้วจะเข้าอัตโนมัติซ้ำทันที
+  history.replaceState({}, '', location.pathname);
+  showLogin();
+});
+
 
 /* ---------------- NAV ---------------- */
 function renderNav(){
@@ -616,15 +638,24 @@ function renderAdmin(){
         </div>
       </div>
       <button class="btn secondary" id="addUserBtn">+ เพิ่มผู้ใช้งาน</button>
-      <div style="margin-top:14px">
+      <div class="datalist-hint" style="margin-top:14px">
+        แต่ละคนมีลิงก์เข้าใช้งานของตัวเอง (ฝัง PIN ไว้ในลิงก์) กดคัดลอกแล้วให้พนักงานเซฟเป็นไอคอนหน้าจอโทรศัพท์ (Add to Home Screen) — แตะครั้งเดียวเข้าใช้งานได้เลยทุกวัน ไม่ต้องกดรหัสซ้ำ
+      </div>
+      <div style="margin-top:6px">
         ${users.map(u=>`
-          <div class="admin-user-row">
-            <div>
-              <b class="mono">${esc(u.pin)}</b> — ${esc(u.name)}
-              <span class="role-pill ${u.role}">${u.role==='admin'?'แอดมิน':'พนักงานชั้น'}</span>
-              ${u.role==='floor' ? `<div style="font-size:11px;color:var(--sub);margin-top:2px">${(u.floors||[]).join(', ') || 'ยังไม่มอบหมายชั้น'}</div>` : ''}
+          <div class="admin-user-row" style="display:block">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+              <div>
+                <b class="mono">${esc(u.pin)}</b> — ${esc(u.name)}
+                <span class="role-pill ${u.role}">${u.role==='admin'?'แอดมิน':'พนักงานชั้น'}</span>
+                ${u.role==='floor' ? `<div style="font-size:11px;color:var(--sub);margin-top:2px">${(u.floors||[]).join(', ') || 'ยังไม่มอบหมายชั้น'}</div>` : ''}
+              </div>
+              <button class="del-x" data-deluser="${u.id}">✕</button>
             </div>
-            <button class="del-x" data-deluser="${u.id}">✕</button>
+            <div class="access-link-row">
+              <input type="text" class="access-link-input mono" readonly value="${esc(accessLinkFor(u.pin))}">
+              <button class="copy-link-btn" data-copylink="${esc(accessLinkFor(u.pin))}">คัดลอก</button>
+            </div>
           </div>`).join('')}
       </div>
     </div>
@@ -729,6 +760,19 @@ function renderAdmin(){
       renderAdmin();
     };
   });
+
+  document.querySelectorAll('[data-copylink]').forEach(b=>{
+    b.onclick = async ()=>{
+      const link = b.dataset.copylink;
+      try{
+        await navigator.clipboard.writeText(link);
+        b.textContent = 'คัดลอกแล้ว ✓';
+        setTimeout(()=>{ b.textContent = 'คัดลอก'; }, 1500);
+      }catch(e){
+        prompt('คัดลอกลิงก์นี้ (กดค้างที่ข้อความ แล้วเลือก Copy):', link);
+      }
+    };
+  });
 }
 
 function renderFloorButtons(){
@@ -760,7 +804,7 @@ function renderFloorButtons(){
     return;
   }
   initFirebase();
-  listenForChanges(()=> showLogin());
+  listenForChanges(()=> tryAutoLoginOrShowLogin());
 })();
 </script>
 </body>
